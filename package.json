@@ -1,0 +1,13 @@
+{
+  "name": "negocios-de-barrio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Build + start combinados para desplegar todo el proyecto (API + sitio) como un único servicio web.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix backend",
+    "start": "npm start --prefix backend"
+  }
+}

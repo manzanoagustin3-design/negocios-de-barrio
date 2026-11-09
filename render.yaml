@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: negocios-de-barrio
+    env: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      # Token para entrar al panel admin — ponelo vos, largo y random,
+      # cuando Render te lo pida al crear el servicio.
+      - key: ADMIN_TOKEN
+        sync: false
+      # Dejalo en blanco en el primer deploy. Una vez que Render te dé la
+      # URL final (algo como https://negocios-de-barrio-xxxx.onrender.com),
+      # volvé a Settings → Environment y pegala acá tal cual, sin "/" al
+      # final. Guardar dispara un redeploy automático.
+      - key: FRONTEND_URL
+        sync: false
+      - key: GOOGLE_API_ENABLED
+        value: "false"
