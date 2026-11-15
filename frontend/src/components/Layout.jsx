@@ -3,10 +3,20 @@ import { Link, useLocation } from 'react-router-dom'
 export default function Layout({ children }) {
   const location = useLocation()
   const isAdmin = location.pathname.startsWith('/admin')
+  // La encuesta pública vive en "/" y usa el tema oscuro/cinematográfico —
+  // el header y el footer se adaptan para quedar integrados, en vez de
+  // mostrar una franja blanca arriba de un fondo negro.
+  const isSurvey = location.pathname === '/'
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="border-b border-ink-200 bg-white">
+      <header
+        className={
+          isSurvey
+            ? 'absolute inset-x-0 top-0 z-10 border-b border-white/10 bg-transparent'
+            : 'border-b border-ink-200 bg-white'
+        }
+      >
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
           <Link to="/" className="flex items-center gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white">
@@ -15,23 +25,37 @@ export default function Layout({ children }) {
                 <circle cx="12" cy="10" r="3" fill="white" />
               </svg>
             </span>
-            <span className="font-display text-lg font-bold text-ink-900">Negocios de Barrio</span>
+            <span className={`font-display text-lg font-bold ${isSurvey ? 'text-white' : 'text-ink-900'}`}>
+              Negocios de Barrio
+            </span>
           </Link>
-          <nav className="flex items-center gap-4 text-sm font-medium text-ink-600">
-            <Link to="/estado" className="hover:text-ink-900">
+          <nav className={`flex items-center gap-4 text-sm font-medium ${isSurvey ? 'text-white/70' : 'text-ink-600'}`}>
+            <Link to="/estado" className={isSurvey ? 'hover:text-white' : 'hover:text-ink-900'}>
               Consultar mi registro
             </Link>
             <Link
               to="/admin"
-              className={`rounded-lg px-3 py-1.5 ${isAdmin ? 'bg-ink-900 text-white' : 'hover:text-ink-900'}`}
+              className={`rounded-lg px-3 py-1.5 ${
+                isAdmin
+                  ? 'bg-ink-900 text-white'
+                  : isSurvey
+                    ? 'border border-white/15 hover:border-white/30 hover:text-white'
+                    : 'hover:text-ink-900'
+              }`}
             >
               Panel admin
             </Link>
           </nav>
         </div>
       </header>
-      <main className="flex-1 bg-ink-50">{children}</main>
-      <footer className="border-t border-ink-200 bg-white py-6 text-center text-xs text-ink-400">
+      <main className={isSurvey ? 'flex-1 bg-night-950' : 'flex-1 bg-ink-50'}>{children}</main>
+      <footer
+        className={
+          isSurvey
+            ? 'border-t border-white/10 bg-night-950 py-6 text-center text-xs text-white/30'
+            : 'border-t border-ink-200 bg-white py-6 text-center text-xs text-ink-400'
+        }
+      >
         Negocios de Barrio — ayudando a que el comercio de cercanía aparezca en el mapa.
       </footer>
     </div>
