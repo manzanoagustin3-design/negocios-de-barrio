@@ -23,15 +23,45 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 function Field({ label, children, hint }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-ink-700">{label}</span>
+      <span className="mb-1.5 block text-sm font-medium text-white/70">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-ink-400">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-white/35">{hint}</span>}
     </label>
   )
 }
 
 const inputClass =
-  'w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100'
+  'w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/25 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30'
+
+// Fila de opción numerada, estilo "elegí una opción" (pantallas de decisión
+// tipo videojuego): círculo con el número + título + descripción.
+function ChoiceRow({ n, title, description, selected, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group flex w-full items-center gap-4 rounded-2xl border p-5 text-left transition ${
+        selected
+          ? 'border-brand-500 bg-brand-500/10 shadow-[0_0_30px_-8px_rgba(249,115,22,0.5)]'
+          : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'
+      }`}
+    >
+      <span
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border font-display text-lg font-bold transition ${
+          selected
+            ? 'border-brand-500 bg-brand-500 text-night-950'
+            : 'border-white/15 bg-white/5 text-white/60 group-hover:border-brand-400/60 group-hover:text-brand-300'
+        }`}
+      >
+        {n}
+      </span>
+      <span className="min-w-0">
+        <span className="block font-display text-base font-bold text-white">{title}</span>
+        <span className="mt-0.5 block text-sm text-white/45">{description}</span>
+      </span>
+    </button>
+  )
+}
 
 export default function RegisterPage() {
   const [step, setStep] = useState(0)
@@ -119,22 +149,23 @@ export default function RegisterPage() {
 
   if (result) {
     return (
-      <div className="mx-auto max-w-xl px-5 py-16 text-center">
-        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+      <div className="relative mx-auto max-w-xl px-5 pb-20 pt-32 text-center text-white">
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(ellipse_at_top,_rgba(249,115,22,0.18),_transparent_70%)]" />
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-400/10 text-emerald-400 shadow-[0_0_30px_-8px_rgba(52,211,153,0.6)]">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h1 className="mb-2 text-2xl font-bold">¡Listo, {form.businessName} quedó registrado!</h1>
-        <p className="mb-6 text-ink-600">
+        <h1 className="mb-2 font-display text-2xl font-bold text-white">¡Listo, {form.businessName} quedó registrado!</h1>
+        <p className="mb-6 text-white/55">
           Vamos a revisar los datos. Guardá este código para consultar el estado de tu trámite en cualquier momento:
         </p>
-        <div className="mb-6 rounded-xl border border-dashed border-ink-300 bg-white px-4 py-3 font-mono text-lg font-bold tracking-wide text-ink-900">
+        <div className="mb-6 rounded-xl border border-dashed border-white/20 bg-white/5 px-4 py-3 font-mono text-lg font-bold tracking-wide text-white">
           {result.business.id}
         </div>
         <Link
           to={`/estado?id=${result.business.id}`}
-          className="inline-flex items-center justify-center rounded-xl bg-ink-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-ink-800"
+          className="inline-flex items-center justify-center rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-night-950 shadow-[0_0_30px_-8px_rgba(249,115,22,0.6)] hover:bg-brand-400"
         >
           Ver el estado de mi registro
         </Link>
@@ -143,66 +174,63 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-5 py-10">
-      <div className="mb-8">
-        <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Registro de negocio</p>
-        <h1 className="mt-1 text-3xl font-bold text-ink-900">Sumá tu negocio al mapa del barrio</h1>
-        <p className="mt-2 text-ink-600">
-          Completá tus datos. Más adelante te vamos a guiar para que, si querés, tu negocio aparezca también en Google Maps
-          — ese paso final siempre lo confirmás vos, iniciando sesión con tu propia cuenta de Google.
-        </p>
-      </div>
+    <div className="relative px-5 pb-20 pt-28">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96 bg-[radial-gradient(ellipse_at_top,_rgba(249,115,22,0.14),_transparent_70%)]" />
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-10">
+          <p className="font-display text-xs font-bold uppercase tracking-[0.25em] text-brand-400">Registro de negocio</p>
+          <h1 className="mt-2 font-display text-3xl font-black uppercase tracking-tight text-white sm:text-4xl" style={{ textWrap: 'balance' }}>
+            Sumá tu negocio al mapa del barrio
+          </h1>
+          <p className="mt-3 max-w-xl text-white/55">
+            Completá tus datos. Más adelante te vamos a guiar para que, si querés, tu negocio aparezca también en Google
+            Maps — ese paso final siempre lo confirmás vos, iniciando sesión con tu propia cuenta de Google.
+          </p>
+        </div>
 
-      <ol className="mb-8 flex flex-wrap gap-2 text-xs font-medium">
-        {STEPS.map((s, i) => (
-          <li
-            key={s}
-            className={`rounded-full px-3 py-1 ${
-              i === step ? 'bg-brand-500 text-white' : i < step ? 'bg-brand-100 text-brand-700' : 'bg-ink-100 text-ink-400'
-            }`}
-          >
-            {i + 1}. {s}
-          </li>
-        ))}
-      </ol>
+        <div className="mb-8">
+          <div className="mb-3 flex items-baseline justify-between gap-4">
+            <span className="font-display text-xs font-bold uppercase tracking-[0.2em] text-brand-400">
+              Paso {step + 1} de {STEPS.length}
+            </span>
+            <span className="truncate text-xs text-white/40">{STEPS[step]}</span>
+          </div>
+          <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full bg-brand-500 transition-all duration-500"
+              style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+            />
+          </div>
+        </div>
 
-      <div className="rounded-2xl border border-ink-200 bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-sm sm:p-8">
         {step === 0 && (
-          <div className="space-y-4">
-            <p className="text-sm text-ink-600">
+          <div className="space-y-5">
+            <h2 className="font-display text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
+              ¿Quién sos?
+            </h2>
+            <p className="text-sm text-white/50">
               Para armar bien el trámite necesitamos saber quién nos está contando sobre este negocio.
             </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
+            <div className="space-y-3">
+              <ChoiceRow
+                n={1}
+                title="Soy el/la dueño/a"
+                description="Quiero registrar mi propio negocio."
+                selected={form.reporter.type === 'dueno'}
                 onClick={() => patch('reporter', { type: 'dueno' })}
-                className={`rounded-xl border-2 p-4 text-left transition ${
-                  form.reporter.type === 'dueno'
-                    ? 'border-brand-500 bg-brand-50'
-                    : 'border-ink-200 bg-white hover:border-brand-300'
-                }`}
-              >
-                <span className="block font-semibold text-ink-900">Soy el/la dueño/a</span>
-                <span className="mt-1 block text-sm text-ink-500">Quiero registrar mi propio negocio.</span>
-              </button>
-              <button
-                type="button"
+              />
+              <ChoiceRow
+                n={2}
+                title="Soy otra persona"
+                description="Vi un negocio del barrio que no está en Google Maps y quiero avisar."
+                selected={form.reporter.type === 'tercero'}
                 onClick={() => patch('reporter', { type: 'tercero' })}
-                className={`rounded-xl border-2 p-4 text-left transition ${
-                  form.reporter.type === 'tercero'
-                    ? 'border-brand-500 bg-brand-50'
-                    : 'border-ink-200 bg-white hover:border-brand-300'
-                }`}
-              >
-                <span className="block font-semibold text-ink-900">Soy otra persona</span>
-                <span className="mt-1 block text-sm text-ink-500">
-                  Vi un negocio del barrio que no está en Google Maps y quiero avisar.
-                </span>
-              </button>
+              />
             </div>
             {isTercero && (
-              <div className="space-y-4 rounded-xl bg-ink-50 p-4">
-                <p className="text-sm text-ink-600">
+              <div className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                <p className="text-sm text-white/50">
                   Buenísimo — le vamos a avisar al dueño/a para que confirme sus datos y, si quiere, publique su negocio.
                   Dejanos tus datos para poder contactarte si hace falta (son opcionales).
                 </p>
@@ -315,7 +343,9 @@ export default function RegisterPage() {
               />
             </Field>
             <Field label="Ubicación exacta en el mapa">
-              <MapPicker value={position} onChange={setPosition} />
+              <div className="rounded-2xl bg-white p-3 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)]">
+                <MapPicker value={position} onChange={setPosition} />
+              </div>
             </Field>
           </div>
         )}
@@ -324,7 +354,7 @@ export default function RegisterPage() {
           <div className="space-y-4">
             {!isTercero ? (
               <>
-                <p className="text-sm text-ink-500">
+                <p className="text-sm text-white/50">
                   Estos son tus datos como dueño/a — no se muestran públicamente, son para contactarte.
                 </p>
                 <Field label="Tu nombre">
@@ -354,7 +384,7 @@ export default function RegisterPage() {
               </>
             ) : (
               <>
-                <p className="text-sm text-ink-500">
+                <p className="text-sm text-white/50">
                   Si conocés al dueño/a, dejanos sus datos para poder avisarle (opcional, pero ayuda mucho).
                 </p>
                 <Field label="Nombre del dueño/a (opcional)">
@@ -384,8 +414,8 @@ export default function RegisterPage() {
               </>
             )}
 
-            <hr className="my-2 border-ink-100" />
-            <p className="text-sm text-ink-500">Datos públicos del negocio (opcionales, pero recomendados).</p>
+            <hr className="my-2 border-white/10" />
+            <p className="text-sm text-white/50">Datos públicos del negocio (opcionales, pero recomendados).</p>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Teléfono del negocio">
                 <input
@@ -432,39 +462,43 @@ export default function RegisterPage() {
 
         {step === 4 && (
           <div className="space-y-4">
-            <p className="text-sm text-ink-500">Marcá los días y horarios de atención del negocio.</p>
-            <HoursEditor value={form.hours} onChange={(hours) => patch(null, { hours })} />
+            <p className="text-sm text-white/50">Marcá los días y horarios de atención del negocio.</p>
+            <div className="overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)]">
+              <HoursEditor value={form.hours} onChange={(hours) => patch(null, { hours })} />
+            </div>
           </div>
         )}
 
         {step === 5 && (
           <div className="space-y-4">
-            <p className="text-sm text-ink-500">Sumá algunas fotos del local — ayudan mucho a que la ficha se vea confiable.</p>
-            <PhotoUploader files={photos} onChange={setPhotos} />
+            <p className="text-sm text-white/50">Sumá algunas fotos del local — ayudan mucho a que la ficha se vea confiable.</p>
+            <div className="rounded-2xl bg-white p-3 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)]">
+              <PhotoUploader files={photos} onChange={setPhotos} />
+            </div>
           </div>
         )}
 
         {step === 6 && (
           <div className="space-y-5">
-            <h2 className="text-lg font-bold">Revisá antes de enviar</h2>
-            <dl className="divide-y divide-ink-100 text-sm">
+            <h2 className="font-display text-lg font-bold text-white">Revisá antes de enviar</h2>
+            <dl className="divide-y divide-white/10 text-sm">
               <div className="flex justify-between py-2">
-                <dt className="text-ink-500">Quién reporta</dt>
-                <dd className="font-medium text-ink-900">{isTercero ? 'Otra persona (tercero)' : 'El/la dueño/a'}</dd>
+                <dt className="text-white/45">Quién reporta</dt>
+                <dd className="font-medium text-white">{isTercero ? 'Otra persona (tercero)' : 'El/la dueño/a'}</dd>
               </div>
               <div className="flex justify-between py-2">
-                <dt className="text-ink-500">Negocio</dt>
-                <dd className="font-medium text-ink-900">{form.businessName} · {form.category}</dd>
+                <dt className="text-white/45">Negocio</dt>
+                <dd className="font-medium text-white">{form.businessName} · {form.category}</dd>
               </div>
               <div className="flex justify-between py-2">
-                <dt className="text-ink-500">Dirección</dt>
-                <dd className="text-right font-medium text-ink-900">
+                <dt className="text-white/45">Dirección</dt>
+                <dd className="text-right font-medium text-white">
                   {form.address.street} {form.address.number}, {form.address.city}, {form.address.province}
                 </dd>
               </div>
               <div className="flex justify-between py-2">
-                <dt className="text-ink-500">{isTercero ? 'Tu contacto' : 'Contacto'}</dt>
-                <dd className="text-right font-medium text-ink-900">
+                <dt className="text-white/45">{isTercero ? 'Tu contacto' : 'Contacto'}</dt>
+                <dd className="text-right font-medium text-white">
                   {isTercero
                     ? [form.reporter.name, form.reporter.phone, form.reporter.email].filter(Boolean).join(' · ') ||
                       'No dejaste datos propios'
@@ -473,18 +507,18 @@ export default function RegisterPage() {
               </div>
               {isTercero && (form.owner.name || form.owner.phone || form.owner.email) && (
                 <div className="flex justify-between py-2">
-                  <dt className="text-ink-500">Dueño/a (según vos)</dt>
-                  <dd className="text-right font-medium text-ink-900">
+                  <dt className="text-white/45">Dueño/a (según vos)</dt>
+                  <dd className="text-right font-medium text-white">
                     {[form.owner.name, form.owner.phone, form.owner.email].filter(Boolean).join(' · ')}
                   </dd>
                 </div>
               )}
               <div className="flex justify-between py-2">
-                <dt className="text-ink-500">Fotos</dt>
-                <dd className="font-medium text-ink-900">{photos.length} cargada(s)</dd>
+                <dt className="text-white/45">Fotos</dt>
+                <dd className="font-medium text-white">{photos.length} cargada(s)</dd>
               </div>
             </dl>
-            <p className="rounded-xl bg-brand-50 p-4 text-xs text-brand-800">
+            <p className="rounded-xl border border-brand-500/20 bg-brand-500/10 p-4 text-xs text-brand-200">
               {isTercero
                 ? 'Al enviar, le vamos a avisar al dueño/a (o vamos a intentar encontrarlo) para que confirme los datos y, si quiere, autorice la publicación con su propia cuenta de Google.'
                 : 'Al enviar, tu registro queda pendiente de revisión. Después te vamos a mandar un link para confirmar tus datos y, más adelante, autorizar la publicación con tu propia cuenta de Google.'}
@@ -493,40 +527,41 @@ export default function RegisterPage() {
         )}
 
         {errors.length > 0 && (
-          <ul className="mt-4 space-y-1 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+          <ul className="mt-4 space-y-1 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
             {errors.map((e) => (
               <li key={e}>• {e}</li>
             ))}
           </ul>
         )}
 
-        <div className="mt-6 flex justify-between">
-          <button
-            type="button"
-            onClick={back}
-            disabled={step === 0}
-            className="rounded-xl px-4 py-2.5 text-sm font-semibold text-ink-600 disabled:opacity-0"
-          >
-            Atrás
-          </button>
-          {step < STEPS.length - 1 ? (
+          <div className="mt-6 flex justify-between">
             <button
               type="button"
-              onClick={next}
-              className="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600"
+              onClick={back}
+              disabled={step === 0}
+              className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white/50 transition hover:text-white disabled:opacity-0"
             >
-              Siguiente
+              Atrás
             </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60"
-            >
-              {submitting ? 'Enviando…' : 'Enviar registro'}
-            </button>
-          )}
+            {step < STEPS.length - 1 ? (
+              <button
+                type="button"
+                onClick={next}
+                className="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-night-950 shadow-[0_0_30px_-10px_rgba(249,115,22,0.7)] transition hover:bg-brand-400"
+              >
+                Siguiente
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-night-950 shadow-[0_0_30px_-10px_rgba(249,115,22,0.7)] transition hover:bg-brand-400 disabled:opacity-60"
+              >
+                {submitting ? 'Enviando…' : 'Enviar registro'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
