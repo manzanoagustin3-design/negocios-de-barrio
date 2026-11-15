@@ -31,6 +31,16 @@ export default {
           700: '#3e475b',
           800: '#2b3242',
           900: '#191d27'
+        },
+        // Paleta oscura/cinematográfica — sólo para la encuesta pública (RegisterPage),
+        // pensada para las pantallas de "elegí una opción" numeradas estilo video.
+        night: {
+          950: '#08090c',
+          900: '#121318',
+          800: '#1b1d25',
+          700: '#262935',
+          600: '#363a49',
+          500: '#4b5063'
         }
       }
     }
