@@ -17,19 +17,19 @@ export default function Layout({ children }) {
             : 'border-b border-ink-200 bg-white'
         }
       >
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-5 py-4">
+          <Link to="/" className="flex shrink-0 items-center gap-2">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8z" fill="currentColor" />
                 <circle cx="12" cy="10" r="3" fill="white" />
               </svg>
             </span>
-            <span className={`font-display text-lg font-bold ${isSurvey ? 'text-white' : 'text-ink-900'}`}>
+            <span className={`whitespace-nowrap font-display text-lg font-bold ${isSurvey ? 'text-white' : 'text-ink-900'}`}>
               Negocios de Barrio
             </span>
           </Link>
-          <nav className={`flex items-center gap-4 text-sm font-medium ${isSurvey ? 'text-white/70' : 'text-ink-600'}`}>
+          <nav className={`flex shrink-0 items-center gap-4 whitespace-nowrap text-sm font-medium ${isSurvey ? 'text-white/70' : 'text-ink-600'}`}>
             <Link to="/estado" className={isSurvey ? 'hover:text-white' : 'hover:text-ink-900'}>
               Consultar mi registro
             </Link>
