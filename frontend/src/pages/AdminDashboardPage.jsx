@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { adminApi } from '../lib/api'
 import StatusBadge from '../components/StatusBadge'
-import { STATUS_LABELS, PAYMENT_STATUS_LABELS } from '../lib/constants'
+import { STATUS_LABELS } from '../lib/constants'
 
 export default function AdminDashboardPage({ token, onLogout }) {
   const api = adminApi(token)
@@ -118,21 +118,20 @@ export default function AdminDashboardPage({ token, onLogout }) {
               <th className="px-4 py-3">Localidad</th>
               <th className="px-4 py-3">Reportado por</th>
               <th className="px-4 py-3">Estado</th>
-              <th className="px-4 py-3">Pago</th>
               <th className="px-4 py-3">Creado</th>
             </tr>
           </thead>
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-ink-400">
+          <td colSpan={6} className="px-4 py-8 text-center text-ink-400">
                   Cargando…
                 </td>
               </tr>
             )}
             {!loading && items.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-ink-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-ink-400">
                   No hay registros todavía.
                 </td>
               </tr>
@@ -158,7 +157,6 @@ export default function AdminDashboardPage({ token, onLogout }) {
                 <td className="px-4 py-3">
                   <StatusBadge status={b.status} />
                 </td>
-                <td className="px-4 py-3 text-ink-600">{PAYMENT_STATUS_LABELS[b.payment.status] || b.payment.status}</td>
                 <td className="px-4 py-3 text-ink-500">{new Date(b.createdAt).toLocaleDateString('es-AR')}</td>
               </tr>
             ))}
