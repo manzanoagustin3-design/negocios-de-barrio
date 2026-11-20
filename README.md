@@ -16,24 +16,16 @@ del dueño/a) y después **le avisa al dueño/a real** con un link a un portal
 donde:
 
 1. confirma o corrige los datos cargados,
-2. espera a que lo contactes para cobrarle el servicio (por WhatsApp o en
-   persona — **no hay pago online en ningún lado**), y
-3. una vez que marcás el cobro en el panel admin, autoriza — con su propia
+2. espera a que termines una revisión final (lo que coordines con el
+   dueño/a en ese momento queda fuera de la plataforma a propósito),
+3. una vez que habilitás el paso en el panel admin, autoriza — con su propia
    cuenta de Google — la publicación en Maps.
 
-Importante: **ni el formulario, ni el portal, ni el mensaje de WhatsApp/email
-mencionan precio ni la palabra "pago" en ningún momento.** Todo lo que ve el
-dueño/a es neutro ("vamos a contactarte antes de seguir"); el monto y la
-forma de cobro los manejás vos directamente, fuera de la plataforma. El
-panel admin es el único lugar donde queda registrado el cobro (ver
-**"Cobro del servicio"** más abajo).
-
-Es un proyecto independiente (no depende de ningún otro sistema): un backend
-en Node/Express con una base SQLite liviana, y un frontend en React/Vite.
-
-## Por qué está dividido en fases
-
-Google **no permite** crear y verificar automáticamente una ficha de negocio
+Importante: ni el formulario, ni el portal, ni el mensaje de WhatsApp/email
+mencionan si el servicio tiene costo o no. Todo lo que ve el dueño/a es
+neutro ("vamos a contactarte antes de seguir"); lo que coordines con él/ella
+lo manejás vos directamente, fuera de la plataforma (ver
+**"Habilitar el paso de Google"** más abajo).
 ajena sin que el dueño participe — siempre exige su consentimiento explícito
 y una verificación final (SMS, llamada, email o carta postal) que le llega
 directamente a él. Por eso el sistema separa dos piezas, cada una con su
@@ -41,7 +33,7 @@ propio interruptor:
 
 1. **El directorio y el flujo de carga** (funciona ya, sin depender de nada
    externo): formulario público con rama dueño/tercero, portal de
-   confirmación, cobro manual desde el panel admin, exportación de datos.
+   confirmación, habilitación del paso de Google desde el panel admin, exportación de datos.
 2. **La integración con Google Business Profile** (apagada por defecto,
    `GOOGLE_API_ENABLED=false`): el código está escrito y sigue el flujo
    oficial de la API, pero para activarla hacen falta credenciales reales
@@ -49,34 +41,35 @@ propio interruptor:
    un proceso con requisitos previos, no instantáneo.
 
 Con esa pieza apagada, igual podés probar el sistema completo de punta a
-punta: el portal confirma los datos, queda esperando que marques el cobro
+punta: el portal confirma los datos, queda esperando tu revisión final
 en el panel, y cuando `GOOGLE_API_ENABLED=false` el paso de Google
 simplemente avisa que todavía no está disponible.
 
-## Cobro del servicio
+## Habilitar el paso de Google
 
-No hay ninguna pasarela de pago integrada. El flujo es:
+Lo que coordines con el dueño/a (si cobrás o no, cómo, cuánto) queda
+completamente fuera de esta app — es algo que manejás vos, en privado. El
+flujo es:
 
 1. El dueño/a confirma sus datos en el portal → el negocio pasa al estado
-   **"Esperando cobrarle el servicio"**.
-2. Vos lo contactás por WhatsApp o en persona y le cobrás como prefieras
-   (efectivo, transferencia, lo que sea — queda totalmente fuera del
-   sistema).
+   **"En revisión antes de Google"**.
+2. Vos hacés tu revisión final con el dueño/a — por WhatsApp, en persona,
+   como prefieras — fuera del sistema.
 3. Entrás a la ficha del negocio en el panel admin (`/admin/negocios/:id`)
-   → sección **"Pago"** → marcás **"Marcar pagado"** (podés anotar el monto
-   y una nota, ej. "transferencia 24/10") o **"Marcar exento"** si decidís
-   no cobrarle a ese negocio en particular.
-4. Al marcarlo, el negocio pasa automáticamente a **"Pago confirmado —
-   listo para autorizar Google"**, y recién ahí el dueño/a puede volver al
-   mismo link del portal y autorizar la publicación con su cuenta de
-   Google. El backend rechaza el pedido de autorización (`GET
-   /api/google/:businessId/consent-url`) con 409 si el pago todavía no está
-   marcado como pagado/exento.
+        y marcás **"Habilitar paso de Google"** cuando quieras que el dueño/a
+        pueda continuar.
+4. Al marcarlo, el negocio pasa automáticamente a **"Listo para autorizar
+   Google"**, y recién ahí el dueño/a puede volver al mismo link del
+   portal y autorizar la publicación con su cuenta de Google. El backend
+   rechaza el pedido de autorización (`GET
+   /api/google/:businessId/consent-url`) con 409 si todavía no habilitaste
+   ese paso.
 
-El dueño/a no ve en ningún momento el monto, el estado de pago, ni la
-palabra "pago" en el portal — sólo un mensaje genérico de "nos vamos a
-poner en contacto antes de seguir". Todo el registro del cobro (estado,
-monto, nota) vive sólo en el panel admin y en el CSV exportable.
+El dueño/a no ve en ningún momento ninguna mención de costos en el portal
+— sólo un mensaje genérico de "nos vamos a poner en contacto antes de
+seguir". Internamente el sistema reutiliza el mismo campo que antes
+guardaba el estado de pago para registrar esta habilitación, pero no se
+expone en ningún lado como tal.
 
 ## Estructura del proyecto
 
@@ -135,15 +128,14 @@ El frontend ya tiene un proxy configurado (`vite.config.js`) para mandar
 - Guardá el código que te da al final, o copiá el link del portal que te
   muestra el panel admin.
 - Entrá a `http://localhost:5173/admin` con el `ADMIN_TOKEN` del `.env` —
-  ahí vas a ver el registro, con filtros, columna de "reportado por", columna
-  de pago, cambio de estado, botón para generar y mandar el link del portal
+ahí vas a ver el registro, con filtros, columna de "reportado por", cambio
+   de estado, botón para generar y mandar el link del portal
   (con link de WhatsApp listo), y exportación a CSV.
 - Abrí el link del portal (`/portal/:id`). Si lo cargó un tercero, primero
-  pide confirmar/corregir los datos; apenas confirma, el portal muestra un
-  mensaje genérico de "nos vamos a poner en contacto antes de seguir" (sin
-  mencionar pago).
-- Entrá a la ficha del negocio en el panel admin → sección "Pago" → "Marcar
-  pagado" (o "exento"). Volvé a refrescar el link del portal: ahora pasa al
+   pide confirmar/corregir los datos; apenas confirma, el portal muestra un
+mensaje genérico de "nos vamos a poner en contacto antes de seguir".
+- Entrá a la ficha del negocio en el panel admin y hacé clic en "Habilitar
+   paso de Google". Volvé a refrescar el link del portal: ahora pasa al
   paso de Google, que como `GOOGLE_API_ENABLED=false` avisa que ese paso
   todavía no está disponible.
 
@@ -199,26 +191,26 @@ requisitos de Google, no limitaciones de este proyecto.
 El módulo entero vive en `backend/src/services/googleBusinessProfile.js` y
 `backend/src/routes/google.routes.js`. Este paso es siempre el **último** del
 portal — sólo aparece disponible una vez que el dueño/a confirmó sus datos
-Y el admin marcó el cobro del servicio como pagado o exento desde el panel
-(ver **"Cobro del servicio"** más arriba):
+y el admin habilitó el paso desde el panel
+(ver **"Habilitar el paso de Google"** más arriba):
 
 1. En el portal (`/portal/:businessId`), el dueño/a toca "Autorizar con mi
    cuenta de Google". Esto pide la URL de consentimiento
    (`GET /api/google/:businessId/consent-url`), que el backend sólo entrega
-   si `owner.confirmed` es verdadero y el pago ya está marcado como
-   pagado/exento — nunca antes.
-2. El dueño/a inicia sesión **con su propia cuenta de Google** y autoriza el
+si `owner.confirmed` es verdadero y el admin ya habilitó ese paso — nunca
+   antes.
+   3. El dueño/a inicia sesión **con su propia cuenta de Google** y autoriza el
    acceso (`business.manage`). Esto cumple el requisito de Google de
    consentimiento explícito — la plataforma nunca actúa en nombre del dueño
    sin que él inicie sesión.
-3. Google redirige de vuelta al portal (`/portal/:businessId`), que lo guía
+4. Google redirige de vuelta al portal (`/portal/:businessId`), que lo guía
    paso a paso:
    - Buscar si el negocio ya existe en Google (para no duplicar — Google
      despublica fichas duplicadas).
    - Si no existe, crear la ubicación.
    - Elegir un método de verificación (SMS, llamada, email o carta) y
      recibir el código **el propio dueño**, que lo ingresa ahí mismo.
-4. Al completarse la verificación, la ficha queda publicada en Google Maps y
+5. Al completarse la verificación, la ficha queda publicada en Google Maps y
    Búsqueda, y el estado del negocio pasa a "Verificado y publicado en Maps"
    en el panel admin.
 
@@ -249,9 +241,9 @@ También: las rutas del flujo del dueño (`/api/google/:businessId/...`,
 `/api/registrations/:id/portal`) usan el `businessId` (un nanoid de 12
 caracteres no adivinable) como si fuera un token de acceso. Para producción
 conviene reforzarlo con un token firmado de corta duración en vez de confiar
-sólo en que el id no se adivina. La ruta de cobro
+sólo en que el id no se adivina. La ruta para habilitar el paso de Google
 (`PATCH /api/admin/registrations/:id/payment`) sí requiere el `ADMIN_TOKEN`
-— sólo el admin puede marcar un pago, nunca el dueño/a desde el portal.
+— sólo el admin puede habilitarlo, nunca el dueño/a desde el portal.
 
 ## El QR y el afiche para los postes
 
