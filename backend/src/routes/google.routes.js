@@ -14,7 +14,7 @@ import { getBusinessById, updateBusinessStatus, updateGoogleInfo } from '../mode
 import {
   saveTokens, getTokens, saveLocationRefs, getGoogleRefs, saveActiveVerification
 } from '../models/googleTokenRepository.js'
-import { STATUSES, PAYMENT_STATUSES } from '../config/statuses.js'
+import { STATUSES } from '../config/statuses.js'
 
 export const googleRouter = Router()
 
@@ -36,8 +36,9 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
 
 // El dueño/a pide, desde el portal, el link para autorizar con su propia
 // cuenta de Google. Sólo se habilita una vez que confirmó sus datos Y el
-// admin marcó el cobro del servicio como pagado o exento desde el panel
-// (el cobro es manual — por WhatsApp o en persona, no hay pago online).
+// admin dio el visto bueno final desde el panel (lo que se coordine entre
+// el admin y el dueño/a antes de ese visto bueno queda fuera de la
+// plataforma a propósito).
 googleRouter.get('/:businessId/consent-url', (req, res) => {
   if (!requireEnabled(res)) return
   const business = getBusinessById(req.params.businessId)
@@ -45,8 +46,9 @@ googleRouter.get('/:businessId/consent-url', (req, res) => {
   if (!business.owner.confirmed) {
     return res.status(409).json({ error: 'Primero confirmá los datos del negocio en el portal' })
   }
-  if (![PAYMENT_STATUSES.PAGADO, PAYMENT_STATUSES.EXENTO].includes(business.payment.status)) {
-    return res.status(409).json({ error: 'Todavía no se confirmó el pago del servicio' })
+  if (business.status === STATUSES.ESPERANDO_PAGO) {
+      return res.status(409).json({ error: 'Todavía estamos terminando de revisar el registro' })
+    
   }
 
   try {
