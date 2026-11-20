@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit'
 import { upload } from '../middleware/upload.js'
 import { validateRegistration, validateOwnerConfirmation } from '../services/validateRegistration.js'
 import { createBusiness, getBusinessById, updateBusinessData } from '../models/businessRepository.js'
-import { CATEGORIES, STATUS_LABELS, OWNER_STATUS_LABELS } from '../config/statuses.js'
+import { CATEGORIES, STATUS_LABELS, OWNER_STATUS_LABELS, STATUSES } from '../config/statuses.js'
 import { isGoogleIntegrationEnabled } from '../services/googleBusinessProfile.js'
 
 export const publicRouter = Router()
@@ -93,17 +93,16 @@ publicRouter.get('/registrations/:id/portal', (req, res) => {
     business: hidePaymentDetails(business),
     statusLabel: OWNER_STATUS_LABELS[business.status],
     needsOwnerReview: !business.owner.confirmed,
-    needsPayment: business.owner.confirmed && !['pagado', 'exento'].includes(business.payment.status),
+    needsReview: business.owner.confirmed && business.status === STATUSES.ESPERANDO_PAGO,
     google: { enabled: isGoogleIntegrationEnabled() }
   })
 })
 
 // El dueño/a confirma o corrige los datos (sobre todo importante cuando los
 // cargó un tercero). Esto es lo primero que pasa en el portal. Después de
-// confirmar, el admin lo contacta por WhatsApp o en persona para cobrarle
-// el servicio (pago manual, no hay checkout online, y no se le menciona en
-// ningún texto de la plataforma) y recién ahí se habilita el paso de
-// autorizar Google.
+// confirmar, el admin hace una revisión final (lo que se coordine con el
+// dueño/a en ese momento queda fuera de esta app a propósito) y recién ahí
+// se habilita el paso de autorizar Google.
 publicRouter.patch('/registrations/:id/portal', (req, res) => {
   const business = getBusinessById(req.params.id)
   if (!business) return res.status(404).json({ error: 'No se encontró ese registro' })
