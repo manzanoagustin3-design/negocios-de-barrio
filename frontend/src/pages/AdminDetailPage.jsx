@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { adminApi } from '../lib/api'
 import StatusBadge from '../components/StatusBadge'
-import { STATUS_LABELS, DAYS, REPORTER_TYPE_LABELS, PAYMENT_STATUS_LABELS } from '../lib/constants'
+import { STATUS_LABELS, DAYS, REPORTER_TYPE_LABELS } from '../lib/constants'
 
 export default function AdminDetailPage({ token }) {
   const { id } = useParams()
@@ -15,8 +15,6 @@ export default function AdminDetailPage({ token }) {
   const [adminNotes, setAdminNotes] = useState('')
   const [portalLinkResult, setPortalLinkResult] = useState(null)
   const [portalLinkError, setPortalLinkError] = useState('')
-  const [paymentAmount, setPaymentAmount] = useState('')
-  const [paymentNote, setPaymentNote] = useState('')
   const [busy, setBusy] = useState(false)
 
   async function load() {
@@ -26,8 +24,6 @@ export default function AdminDetailPage({ token }) {
     setNewStatus(res.business.status)
     setAdminNotes(res.business.adminNotes || '')
     setRejectionReason(res.business.rejectionReason || '')
-    setPaymentAmount(res.business.payment.amount ?? '')
-    setPaymentNote(res.business.payment.note || '')
   }
 
   useEffect(() => {
@@ -56,19 +52,15 @@ export default function AdminDetailPage({ token }) {
     }
   }
 
-  async function handleSetPayment(status) {
+async function handleEnableGoogleStep() {
     setBusy(true)
     try {
-      await api.setPayment(id, {
-        status,
-        amount: paymentAmount === '' ? null : Number(paymentAmount),
-        note: paymentNote
-      })
-      await load()
+          await api.setPayment(id, { status: 'exento', amount: null, note: '' })
+          await load()
     } finally {
-      setBusy(false)
+          setBusy(false)
     }
-  }
+}
 
   async function handleSendPortalLink() {
     setPortalLinkError('')
@@ -228,53 +220,21 @@ export default function AdminDetailPage({ token }) {
             </button>
           </Section>
 
-          <Section title="Pago">
-            <Row label="Estado" value={PAYMENT_STATUS_LABELS[business.payment.status] || business.payment.status} />
-            {business.payment.amount != null && <Row label="Monto" value={`$${business.payment.amount}`} />}
-            {business.payment.note && <Row label="Nota" value={business.payment.note} />}
-            <p className="mb-2 mt-3 text-xs text-ink-500">
-              El cobro es manual — por WhatsApp o en persona, acá sólo queda el registro. El dueño/a no ve el monto
-              ni la nota en el portal; una vez que marcás "Pagado" o "Exento" se habilita el paso de Google.
+          {business.status === 'esperando_pago' && (
+        <Section title="Avanzar al siguiente paso">
+            <p className="mb-3 text-xs text-ink-500">
+                  Esto queda a tu criterio — lo que hayas coordinado con el dueño/a por fuera de la plataforma no se
+                  registra acá. Cuando termines esa revisión, habilitá el paso de autorización de Google.
             </p>
-            <div className="mb-2 grid grid-cols-2 gap-2">
-              <input
-                type="number"
-                value={paymentAmount}
-                onChange={(e) => setPaymentAmount(e.target.value)}
-                placeholder="Monto (opcional)"
-                className="rounded-xl border border-ink-200 px-3 py-2 text-sm"
-              />
-              <input
-                value={paymentNote}
-                onChange={(e) => setPaymentNote(e.target.value)}
-                placeholder="Nota (ej. efectivo, transferencia)"
-                className="rounded-xl border border-ink-200 px-3 py-2 text-sm"
-              />
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleSetPayment('pagado')}
-                disabled={busy}
-                className="flex-1 rounded-xl border border-ink-200 px-2 py-2 text-xs font-semibold text-ink-700 hover:border-emerald-400 disabled:opacity-60"
-              >
-                Marcar pagado
-              </button>
-              <button
-                onClick={() => handleSetPayment('exento')}
-                disabled={busy}
-                className="flex-1 rounded-xl border border-ink-200 px-2 py-2 text-xs font-semibold text-ink-700 hover:border-violet-400 disabled:opacity-60"
-              >
-                Marcar exento
-              </button>
-              <button
-                onClick={() => handleSetPayment('pendiente')}
-                disabled={busy}
-                className="flex-1 rounded-xl border border-ink-200 px-2 py-2 text-xs font-semibold text-ink-700 hover:border-ink-400 disabled:opacity-60"
-              >
-                Marcar pendiente
-              </button>
-            </div>
-          </Section>
+            <button
+                    onClick={handleEnableGoogleStep}
+                    disabled={busy}
+                    className="w-full rounded-xl bg-brand-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                  >
+              {busy ? 'Habilitando…' : 'Habilitar paso de Google'}
+            </button>
+        </Section>
+        )}
 
           <Section title="Contactar al dueño/a">
             <p className="mb-3 text-xs text-ink-500">
