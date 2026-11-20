@@ -367,7 +367,7 @@ export default function PortalPage() {
             </button>
           </div>
         )
-      ) : portal.needsPayment ? (
+      ) : portal.needsReview ? (
         <div className="space-y-3 rounded-2xl border border-ink-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-bold">¡Datos confirmados!</h2>
           <p className="text-sm text-ink-600">
