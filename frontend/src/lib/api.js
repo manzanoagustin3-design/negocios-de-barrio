@@ -89,8 +89,9 @@ export function adminApi(token) {
     sendPortalLink: (id) =>
       fetch(`${BASE}/admin/registrations/${id}/send-portal-link`, { method: 'POST', headers }).then(handle),
 
-    // Cobro manual del servicio (por WhatsApp o en persona) — no hay pago
-    // online, esto sólo registra en el panel lo que ya cobraste.
+// Habilita el paso de autorización de Google para este negocio. Lo que
+// se haya coordinado con el dueño/a antes de este paso queda fuera de
+// la plataforma a propósito.
     setPayment: (id, { status, amount, note }) =>
       fetch(`${BASE}/admin/registrations/${id}/payment`, {
         method: 'PATCH',
